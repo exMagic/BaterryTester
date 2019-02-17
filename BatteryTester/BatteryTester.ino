@@ -19,7 +19,7 @@ bool cell_3_empty = false;
 bool cell_4_empty = false;
 
 int cycle = 0;
-int mainCycle = 1;
+int mainCycle = 0;
 
 int row1 = 8;
 int row2 = 20;
@@ -217,7 +217,8 @@ float getCurrent(int curr_pin, float curr_offset, float mArray[]) {
 
   float current_avg = ((mArray[0] + mArray[1] + mArray[2] + mArray[3]) / 4);
   float current_print;
-  if (abs(current_avg) < 0.4) {
+
+  if (abs(current_avg) < 0.04) {
     current_print = 0;
   } else {
     current_print = current_avg;
@@ -246,8 +247,88 @@ float getVoltage(int vol_pin, int vol_offset, float mArray[]) {
   return voltage_print;
 }
 
+uint8_t state;
+void setLights(bool x) {
 
+  if (cell_1_empty != true) {
+    digitalWrite(12, !x);//set bulb 1
+  } else {
+    digitalWrite(12, 1);//set bulb 1 OFF
+  }
+  if (cell_2_empty != true) {
+    digitalWrite(11, !x);//set bulb 1
+  } else {
+    digitalWrite(11, 1);//set bulb 1 OFF
+  }
+  if (cell_3_empty != true) {
+    digitalWrite(10, !x);//set bulb 1
+  } else {
+    digitalWrite(10, 1);//set bulb 1 OFF
+  }
+  if (cell_4_empty != true) {
+    digitalWrite(9, !x);//set bulb 1
+  } else {
+    digitalWrite(9, 1);//set bulb 1 OFF
+  }
+}
 
+void setCharger(bool x) {
+  digitalWrite(8, !x);//set charger
+}
+
+void checkFullCharge() {
+  //////////////////////////////// --
+  if (current_1_print == 0 && voltage_1 > 4) {
+    chargeCheck_1++;
+  } else {
+    chargeCheck_1 = 0;
+  }
+  if (chargeCheck_1 > 20) {
+    cell_1_full = true;
+  }
+  //////////////////////////////// --
+  if (current_2_print == 0 && voltage_2 > 4) {
+    chargeCheck_2++;
+  } else {
+    chargeCheck_2 = 0;
+  }
+  if (chargeCheck_2 > 20) {
+    cell_2_full = true;
+  }
+  //////////////////////////////// --
+  if (current_3_print == 0 && voltage_3 > 4) {
+    chargeCheck_3++;
+  } else {
+    chargeCheck_3 = 0;
+  }
+  if (chargeCheck_3 > 20) {
+    cell_3_full = true;
+  }
+  //////////////////////////////// --
+  if (current_4_print == 0 && voltage_4 > 4) {
+    chargeCheck_4++;
+  } else {
+    chargeCheck_4 = 0;
+  }
+  if (chargeCheck_4 > 20) {
+    cell_4_full = true;
+  }
+}
+void checkCellEmpty() {
+  if (voltage_1 < 2.5) {
+    cell_1_empty = true;
+
+  }
+  if ( voltage_2 < 2.5) {
+    cell_2_empty = true;
+  }
+  if (voltage_3 < 2.5) {
+    cell_3_empty = true;
+  }
+  if (voltage_4 < 2.5) {
+    cell_4_empty = true;
+  }
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,93 +382,51 @@ void loop() {
   current_3_print = getCurrent(curr_3_pin, curr_3_offset, array_3);
   current_4_print = getCurrent(curr_4_pin, curr_4_offset, array_4);
 
-  if (cycle == 0) {
-    cycle ++;
-  }
 
-  if (cycle == 1) {
-    digitalWrite(8, LOW);//set charger ON
 
-    digitalWrite(12, HIGH);//set bulb 1 OFF
-    digitalWrite(11, HIGH);//set bulb 2 OFF
-    digitalWrite(10, HIGH);//set bulb 3 OFF
-    digitalWrite(9, HIGH);//set bulb 4 OFF
-  }
 
-  if (cell_1_full == true && cell_2_full == true && cell_3_full == true && cell_4_full == true) {
-    cycle ++;
-  }
 
-  if (cycle == 2) {
-    digitalWrite(8, HIGH);//set charger OFF
-
-    digitalWrite(12, LOW);//set bulb 1 ON
-    digitalWrite(11, LOW);//set bulb 2 ON
-    digitalWrite(10, LOW);//set bulb 3 ON
-    digitalWrite(9, LOW);//set bulb 4 ON
-  }
-
-  if (cell_1_empty == true && cell_2_empty == true && cell_3_empty == true && cell_4_empty == true) {
-    cycle = 0;
-    mainCycle++;
-  }
-  
   if (now.secondstime() > timer) {
     timer = now.secondstime();
-    Serial.print("    OPLA---");
-    Serial.println(mSecond);
-
-    //////////////////////////////// -- FULL CHAGRE CHECK
-    if (cycle == 1 && cell_1_full == false && current_1_print == 0) {
-      chargeCheck_1++;
-    } else {
-      chargeCheck_1 = 0;
-    }
-    if (chargeCheck_1 > 20) {
-      cell_1_full = true;
-    }
-    //////////////////////////////// --
-    if (cycle == 1 && cell_2_full == false && current_2_print == 0) {
-      chargeCheck_2++;
-    } else {
-      chargeCheck_2 = 0;
-    }
-    if (chargeCheck_2 > 20) {
-      cell_2_full = true;
-    }
-    //////////////////////////////// --
-    if (cycle == 1 && cell_3_full == false && current_3_print == 0) {
-      chargeCheck_3++;
-    } else {
-      chargeCheck_3 = 0;
-    }
-    if (chargeCheck_3 > 20) {
-      cell_3_full = true;
-    }
-    //////////////////////////////// --
-    if (cycle == 1 && cell_4_full == false && current_4_print == 0) {
-      chargeCheck_4++;
-    } else {
-      chargeCheck_4 = 0;
-    }
-    if (chargeCheck_4 > 20) {
-      cell_4_full = true;
-    }
+    Serial.print("    cycle---");
+    Serial.println(cycle);
 
 
 
-    //////////////////////////////// -- EMPTY CHECK
-    if (cycle == 2 && cell_1_empty == false && voltage_1 < 2.5) {
-      cell_1_empty = true;
-    }
-    if (cycle == 2 && cell_2_empty == false && voltage_2 < 2.5) {
-      cell_2_empty = true;
-    }
-    if (cycle == 2 && cell_3_empty == false && voltage_3 < 2.5) {
-      cell_3_empty = true;
-    }
-    if (cycle == 2 && cell_4_empty == false && voltage_4 < 2.5) {
-      cell_4_empty = true;
+    switch (cycle) {
+      case 0:
+        setLights(false);
+        setCharger(false);
+
+        cell_1_empty == false;
+        cell_2_empty == false;
+        cell_3_empty == false;
+        cell_4_empty == false;
+
+        cell_1_full == false;
+        cell_2_full == false;
+        cell_3_full == false;
+        cell_4_full == false;
+        cycle ++;
+        mainCycle++;
+        break;
+      case 1:        
+        setLights(false);
+        setCharger(true);
+        checkFullCharge();
+        if (cell_1_full == true && cell_2_full == true && cell_3_full == true && cell_4_full == true) {
+          cycle ++;
+        }
+        break;
+      case 2:
+        setCharger(false);
+        setLights(true);
+        checkCellEmpty();
+
+        if (cell_1_empty == true && cell_2_empty == true && cell_3_empty == true && cell_4_empty == true) {
+          cycle = 0;
+        }
+        break;
     }
 
 
@@ -422,9 +461,15 @@ void loop() {
       myFile.print(voltage_3);
       myFile.print(",");
       myFile.print(voltage_4);
+
+      myFile.print(",");
+      myFile.print(cycle);
+      myFile.print(",");
+      myFile.print(mainCycle);
+
       myFile.println();
       myFile.close();
-      c = 1;
+
 
     } else {
       // if the file didn't open, print an error:
