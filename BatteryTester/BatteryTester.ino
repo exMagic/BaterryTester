@@ -382,103 +382,6 @@ void loop() {
   current_3_print = getCurrent(curr_3_pin, curr_3_offset, array_3);
   current_4_print = getCurrent(curr_4_pin, curr_4_offset, array_4);
 
-
-
-
-
-  if (now.secondstime() > timer) {
-    timer = now.secondstime();
-    Serial.print("    cycle---");
-    Serial.println(cycle);
-
-
-
-    switch (cycle) {
-      case 0:
-        setLights(false);
-        setCharger(false);
-
-        cell_1_empty == false;
-        cell_2_empty == false;
-        cell_3_empty == false;
-        cell_4_empty == false;
-
-        cell_1_full == false;
-        cell_2_full == false;
-        cell_3_full == false;
-        cell_4_full == false;
-        cycle ++;
-        mainCycle++;
-        break;
-      case 1:        
-        setLights(false);
-        setCharger(true);
-        checkFullCharge();
-        if (cell_1_full == true && cell_2_full == true && cell_3_full == true && cell_4_full == true) {
-          cycle ++;
-        }
-        break;
-      case 2:
-        setCharger(false);
-        setLights(true);
-        checkCellEmpty();
-
-        if (cell_1_empty == true && cell_2_empty == true && cell_3_empty == true && cell_4_empty == true) {
-          cycle = 0;
-        }
-        break;
-    }
-
-
-
-    myFile = SD.open(filename, FILE_WRITE);
-    if (myFile) {
-      myFile.print(mDay);
-      myFile.print(".");
-      myFile.print(mMonth);
-      myFile.print(".");
-      myFile.print(mYear);
-      myFile.print(" ");
-      myFile.print(mHour);
-      myFile.print(":");
-      myFile.print(mMinute);
-      myFile.print(":");
-      myFile.print(mSecond);
-
-      myFile.print(",");
-      myFile.print(current_1_print);
-      myFile.print(",");
-      myFile.print(current_2_print);
-      myFile.print(",");
-      myFile.print(current_3_print);
-      myFile.print(",");
-      myFile.print(current_4_print);
-      myFile.print(",");
-      myFile.print(voltage_1);
-      myFile.print(",");
-      myFile.print(voltage_2);
-      myFile.print(",");
-      myFile.print(voltage_3);
-      myFile.print(",");
-      myFile.print(voltage_4);
-
-      myFile.print(",");
-      myFile.print(cycle);
-      myFile.print(",");
-      myFile.print(mainCycle);
-
-      myFile.println();
-      myFile.close();
-
-
-    } else {
-      // if the file didn't open, print an error:
-      Serial.println("error opening loop txt file");
-      c = 0;
-    }
-  }
-
-
   u8g2.firstPage();
   do {
     u8g2.setFont(u8g2_font_profont10_mr );
@@ -568,7 +471,101 @@ void loop() {
     }
     u8g2.print(now.second(), DEC);
     u8g2.println();
-
   } while ( u8g2.nextPage() );
+
+
+  if (now.secondstime() > timer) {
+    timer = now.secondstime();
+
+    switch (cycle) {
+      case 0:
+        Serial.println(" CYCLE ---- 0");
+        setLights(false);
+        setCharger(false);
+
+        cell_1_empty = false;
+        cell_2_empty = false;
+        cell_3_empty = false;
+        cell_4_empty = false;
+
+        cell_1_full = false;
+        cell_2_full = false;
+        cell_3_full = false;
+        cell_4_full = false;
+        cycle ++;
+        mainCycle++;
+        break;
+      case 1:
+        Serial.println(" CYCLE ---- 1");
+        setLights(false);
+        setCharger(true);
+        checkFullCharge();
+        if (cell_1_full == true && cell_2_full == true && cell_3_full == true && cell_4_full == true) {
+          cycle ++;
+        }
+        break;
+      case 2:
+        Serial.println(" CYCLE ---- 2");
+        setCharger(false);
+        setLights(true);
+        checkCellEmpty();
+
+        if (cell_1_empty == true && cell_2_empty == true && cell_3_empty == true && cell_4_empty == true) {
+          cycle = 0;
+        }
+        break;
+    }
+
+
+
+    myFile = SD.open(filename, FILE_WRITE);
+    if (myFile) {
+      myFile.print(mDay);
+      myFile.print(".");
+      myFile.print(mMonth);
+      myFile.print(".");
+      myFile.print(mYear);
+      myFile.print(" ");
+      myFile.print(mHour);
+      myFile.print(":");
+      myFile.print(mMinute);
+      myFile.print(":");
+      myFile.print(mSecond);
+
+      myFile.print(",");
+      myFile.print(current_1_print);
+      myFile.print(",");
+      myFile.print(current_2_print);
+      myFile.print(",");
+      myFile.print(current_3_print);
+      myFile.print(",");
+      myFile.print(current_4_print);
+      myFile.print(",");
+      myFile.print(voltage_1);
+      myFile.print(",");
+      myFile.print(voltage_2);
+      myFile.print(",");
+      myFile.print(voltage_3);
+      myFile.print(",");
+      myFile.print(voltage_4);
+
+      myFile.print(",");
+      myFile.print(cycle);
+      myFile.print(",");
+      myFile.print(mainCycle);
+
+      myFile.println();
+      myFile.close();
+
+
+    } else {
+      // if the file didn't open, print an error:
+      Serial.println("error opening loop txt file");
+      c = 0;
+    }
+  }
+
+
+
 
 }
