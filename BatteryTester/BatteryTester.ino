@@ -218,7 +218,7 @@ float getCurrent(int curr_pin, float curr_offset, float mArray[]) {
   float current_avg = ((mArray[0] + mArray[1] + mArray[2] + mArray[3]) / 4);
   float current_print;
 
-  if (abs(current_avg) < 0.04) {
+  if (abs(current_avg) < 0.09) {
     current_print = 0;
   } else {
     current_print = current_avg;
