@@ -18,6 +18,9 @@ bool cell_2_empty = false;
 bool cell_3_empty = false;
 bool cell_4_empty = false;
 
+
+bool card = false;
+
 int cycle = 0;
 int mainCycle = 0;
 
@@ -182,6 +185,19 @@ void setup() {
     while (1);
   }
   Serial.println("initialization done.");
+  myFile = SD.open("test.txt", FILE_WRITE);
+
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to test.txt...");
+    myFile.println("testing 1, 2, 3.");
+    // close the file:
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
 
   // relays
   pinMode(13, OUTPUT);
@@ -442,6 +458,10 @@ void loop() {
     u8g2.print(" mc:");
     u8g2.print(mainCycle);
 
+    u8g2.print(" card:");
+    u8g2.print(card);
+    
+
 
     u8g2.setFont(u8g2_font_profont10_mn);
     //--------------------------------------------- TIME
@@ -520,6 +540,7 @@ void loop() {
 
     myFile = SD.open(filename, FILE_WRITE);
     if (myFile) {
+      card = true;
       myFile.print(mDay);
       myFile.print(".");
       myFile.print(mMonth);
@@ -559,6 +580,7 @@ void loop() {
 
 
     } else {
+      card = false;
       // if the file didn't open, print an error:
       Serial.println("error opening loop txt file");
       c = 0;
